@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>search</title>
+    <script type="text/javascript" src="./angular.min.js"></script>
+    <style>
+        body {
+            background: #c9b3b3;
+            color: #fff;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .box {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .boxS {
+            width: 40%;
+            margin: 50px;
+            background: #191313;
+            border: 1px solid #585353;
+            border-radius: 10px;
+        }
+
+        .row {
+            padding: 20px;
+        }
+
+        .row span {
+            font-weight: bold;
+        }
+
+        .title {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .title a {
+            color: #d84141;
+            font-size: 22px;
+        }
+
+        th a {
+            color: #d84141;
+            font-size: 22px;
+        }
+
+        button {
+            background-color: #d84141;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        tbody th {
+            width: 16%;
+            border: 1px solid #d841414a;
+        }
+    </style>
+</head>
+
+<body>
+    <div ng-app="App" ng-controller="Ctrl">
+        <div class="title">
+            <a href="index.html">home</a>
+            <a href="search.html">search</a>
+            <a href="fundraiser.html">details</a>
+            <a href="donation.html">donation</a>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div style="display: flex;justify-content: center;">
+                    <label for="CATEGORYID">CATEGORYID： </label>
+                    <select style="width: 200px;" class="form-control" ng-model="CATEGORYID">
+                        <option ng-repeat="x in CATEGORY_IDs" value="{{x.CATEGORYID}}">{{x.NAME}}</option>
+                    </select>
+                    <label for="FUNDRAISERID">FUNDRAISERID： </label>
+                    <input type="text" class="form-control" ng-model="FUNDRAISERID" />
+                    <label for="FUNDRAISERID">ACTIVE </label>
+                    <input type="text" class="form-control" ng-model="Active" />
+
+                </div>
+                <div style="display: flex;justify-content: center;">
+                    <button type="button" ng-click="Query()" style="margin: 30px;">Query</button>
+                    <button type="button" ng-click="Clear()" style="margin: 30px;">Clear</button>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>FUNDRAISERID</th>
+                                <th>ORGANIZER</th>
+                                <th>CAPTION</th>
+                                <th>TARGET_FUNDING</th>
+                                <th>CURRENT_FUNDING</th>
+                                <th>CITY</th>
+                                <th>ACTIVE</th>
+                                <th>CATEGORYID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in list">
+                                <td><a ng-href="{{'./fundraiser.html?' + item.FUNDRAISERID}}">{{item.FUNDRAISERID}}</a>
+                                </td>
+                                <td>{{item.ORGANIZER}}</td>
+                                <td>{{item.CAPTION}}</td>
+                                <td>{{item.TARGET_FUNDING}}</td>
+                                <td>{{item.CURRENT_FUNDING}}</td>
+                                <td>{{item.CITY}}</td>
+                                <td>{{item.ACTIVE}}</td>
+                                <td>{{item.CATEGORYID}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //Define an AJAX function for sending asynchronous requests
+        var app = angular.module('App', []);
+        app.controller('Ctrl', function ($scope, $http) {
+            $scope.FUNDRAISERID = ''
+            $scope.Active = ''
+            $scope.CATEGORYID = ''
+            //Initialize function, send request to obtain category list
+            $http.get("http://localhost:4008/List")
+                .success(function (response) {
+                    $scope.CATEGORY_IDs = response;
+                });
+            $scope.Query = function () {
+                console.log('222');
+
+                // if (!$scope.Active && !$scope.FUNDRAISERID && !$scope.CATEGORYID) {
+                //     alert('must pick one or multiple criteria !')
+                //     return
+                // }
+                $http.get(`http://localhost:4008/getOneFundraiser?ACTIVE=${$scope.Active}&CATEGORYID=${$scope.CATEGORYID}&FUNDRAISERID=${$scope.FUNDRAISERID}`)
+                    .success(function (response) {
+                        if (response.length) {
+                            $scope.list = response;
+                            $scope.note = '';
+                        } else {
+                            $scope.list = [];
+                            $scope.note = 'no fundraisers are found';
+                        }
+                    });
+            }
+            //Query function to retrieve data based on the selected FUNDRAISERID and CATEGORYID
+            $scope.Query()
+            //Clear the value of the input box
+            $scope.Clear = function () {
+                $scope.FUNDRAISERID = ''
+                $scope.Active = ''
+                $scope.CATEGORYID = ''
+            }
+        });
+
+    </script>
+</body>
+
+</html>
