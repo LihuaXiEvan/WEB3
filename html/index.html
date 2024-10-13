@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>home</title>
+    <script type="text/javascript" src="./angular.min.js"></script>
+    <style>
+        body {
+            background: #c9b3b3;
+            color: #fff;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .box {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .boxS {
+            width: 40%;
+            margin: 50px;
+            background: #251c1c;
+            border: 1px solid #585353;
+            border-radius: 10px;
+        }
+
+        .row {
+            padding: 20px;
+        }
+
+        .row span {
+            font-weight: bold;
+        }
+
+        .title {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+        .title a{
+            color: #d84141;
+            font-size: 22px;
+        }
+    </style>
+</head>
+
+<body>
+    <div ng-app="App" ng-controller="Ctrl">
+        <div class="title">
+            <a href="index.html">home</a>
+            <a href="search.html">search</a>
+            <a href="fundraiser.html">details</a>
+            <a href="donation.html">donation</a>
+        </div>
+        <div class="box" >
+            <div class="boxS" ng-repeat="item in list">
+                <div class="row"><span>FUNDRAISERID: </span>{{item.FUNDRAISERID}}</div>
+                <div class="row"><span>ORGANIZER: </span>{{item.ORGANIZER}}</div>
+                <div class="row"><span>CAPTION: </span>{{item.CAPTION}}</div>
+                <div class="row"><span>TARGET_FUNDING: </span>{{item.TARGET_FUNDING}}</div>
+                <div class="row"><span>CURRENT_FUNDING: </span>{{item.CURRENT_FUNDING}}</div>
+                <div class="row"><span>CITY: </span>{{item.CITY}}</div>
+                <div class="row"><span>ACTIVE: </span>{{item.ACTIVE}}</div>
+                <div class="row"><span>CATEGORYID: </span>{{item.CATEGORYID}}</div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //AJAX Request Function
+        var app = angular.module('App', []);
+        app.controller('Ctrl', function ($scope, $http) {
+            $http.get("http://localhost:4008/getActiveFundraisers?active=Active")
+                .success(function (response) {
+                    $scope.list = response;
+                    console.log($scope.list);
+                });
+        });
+    </script>
+</body>
+
+</html>
