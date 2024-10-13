@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>home</title>
+    <script type="text/javascript" src="./angular.min.js"></script>
+    <style>
+        body {
+            background: #c9b3b3;
+            color: #fff;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .box {
+            display: flex;
+        }
+
+        .boxS {
+            width: 40%;
+            margin: 50px;
+            background: #251c1c;
+            border: 1px solid #585353;
+            border-radius: 10px;
+        }
+
+        .row {
+            padding: 20px;
+        }
+
+        .row span {
+            font-weight: bold;
+        }
+
+        .title {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .title a {
+            color: #d84141;
+            font-size: 22px;
+        }
+    </style>
+</head>
+
+<body>
+    <div ng-app="App" ng-controller="Ctrl">
+        <div class="box">
+            <div class="box1" style="width: 220px;">
+                <div class="row">
+                    <div class="row1">FUNDRAISERID:</div>
+                    <input type="text" ng-model="FUNDRAISERID">
+                </div>
+                <div class="row">
+                    <div class="row1">ORGANIZER:</div>
+                    <input type="text" ng-model="ORGANIZER">
+                </div>
+                <div class="row">
+                    <div class="row1">CAPTION:</div>
+                    <input type="text" ng-model="CAPTION">
+                </div>
+                <div class="row">
+                    <div class="row1">TARGET_FUNDING:</div>
+                    <input type="text" ng-model="TARGET_FUNDING">
+                </div>
+                <div class="row">
+                    <div class="row1">CURRENT_FUNDING:</div>
+                    <input type="text" ng-model="CURRENT_FUNDING">
+                </div>
+                <div class="row">
+                    <div class="row1">CITY:</div>
+                    <input type="text" ng-model="CITY">
+                </div>
+                <div class="row">
+                    <div class="row1">ACTIVE:</div>
+                    <input type="text" ng-model="ACTIVE">
+                </div>
+                <div class="row">
+                    <div class="row1">CATEGORYID:</div>
+                    <select style="width: 150px;" ng-model="CATEGORYID">
+                        <option ng-repeat="x in CATEGORY_IDs" value="{{x.CATEGORYID}}">{{x.NAME}}
+                        </option>
+                    </select>
+                </div>
+                <button type="button" ng-show="buttontype == 'add'" ng-click="Add()"
+                    style="margin-left: 20px;margin-top: 20px;background-color: #f00;">{{buttontype}}</button>
+                <button type="button" ng-show="buttontype == 'update'" ng-click="update()"
+                    style="margin-left: 20px;margin-top: 20px;background-color: #f00;">{{buttontype}}</button>
+            </div>
+           
+            <div class="box1" style="width: 70%;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>FUNDRAISERID</th>
+                            <th>ORGANIZER</th>
+                            <th style="width: 300px;">CAPTION</th>
+                            <th>TARGET_FUNDING</th>
+                            <th>CURRENT_FUNDING</th>
+                            <th>CITY</th>
+                            <th>ACTIVE</th>
+                            <th>CATEGORYID</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in list">
+
+                            <td>{{item.FUNDRAISERID}}
+                            </td>
+                            <td>{{item.ORGANIZER}}</td>
+                            <td style="width: 30%;">{{item.CAPTION}}</td>
+                            <td>{{item.TARGET_FUNDING}}</td>
+                            <td>{{item.CURRENT_FUNDING}}</td>
+                            <td>{{item.CITY}}</td>
+                            <td>{{item.ACTIVE}}</td>
+                            <td>{{item.CATEGORYID}}</td>
+                            <td>
+                                <button type="button" ng-click="delete(item)"
+                                   >DELETE</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var app = angular.module('App', []);
+        app.controller('Ctrl', function ($scope, $http) {
+            $scope.paraminit = location.search ? location.search.split('?') : ''
+            $scope.buttontype = 'add'
+            $http.get("http://localhost:4008/List")
+                .success(function (response) {
+                    $scope.CATEGORY_IDs = response;
+                });
+
+            $scope.initlist = function () {
+                $http.get(`http://localhost:4008/getFundraisersList`)
+                    .success(function (response) {
+                        $scope.list = response;
+                    });
+            }
+            $scope.initlist()
+            $scope.Add = function () {
+                $http.post(`http://localhost:4008/addFundraiser`, {
+                    "FUNDRAISERID": $scope.FUNDRAISERID,
+                    "ORGANIZER": $scope.ORGANIZER,
+                    "CAPTION": $scope.CAPTION,
+                    "TARGET_FUNDING": $scope.TARGET_FUNDING,
+                    "CURRENT_FUNDING": $scope.CURRENT_FUNDING,
+                    "CITY": $scope.CITY,
+                    "ACTIVE": $scope.ACTIVE,
+                    "CATEGORYID": $scope.CATEGORYID,
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .success(function (response) {
+                        alert(`add success`)
+                        $scope.initlist()
+                    });
+            }
+            $scope.updatebefore = function (param) {
+                $scope.FUNDRAISERID = param.FUNDRAISERID
+                $scope.ORGANIZER = param.ORGANIZER
+                $scope.CAPTION = param.CAPTION
+                $scope.TARGET_FUNDING = param.TARGET_FUNDING
+                $scope.CURRENT_FUNDING = param.CURRENT_FUNDING
+                $scope.CITY = param.CITY
+                $scope.ACTIVE = param.ACTIVE
+                $scope.CATEGORYID = param.CATEGORYID
+                $scope.buttontype = 'update'
+            }
+            $scope.update = function () {
+                $http.put(`http://localhost:4008/updateFundraiser`, {
+                    "FUNDRAISERID": $scope.FUNDRAISERID,
+                    "ORGANIZER": $scope.ORGANIZER,
+                    "CAPTION": $scope.CAPTION,
+                    "TARGET_FUNDING": $scope.TARGET_FUNDING,
+                    "CURRENT_FUNDING": $scope.CURRENT_FUNDING,
+                    "CITY": $scope.CITY,
+                    "ACTIVE": $scope.ACTIVE,
+                    "CATEGORYID": $scope.CATEGORYID,
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .success(function (response) {
+                        alert(`update success`)
+                        $scope.initlist()
+                    });
+            }
+            $scope.delete = function (row) {
+                $http.get(`http://localhost:4008/getDonationsByFUNDRAISERID?FUNDRAISERID=${row.FUNDRAISERID}`)
+                    .success(function (response) {
+                        if (!response.length) {
+                            $http.delete(`http://localhost:4008/deleteFundraiser?FUNDRAISERID=${row.FUNDRAISERID}`)
+                                .success(function (response) {
+                                    alert(`delete success`)
+                                    $scope.initlist()
+                                });
+                        } else {
+                            alert('Only fundraisers that do not have donations yet can be deleted')
+                        }
+                    });
+
+            }
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>details</title>
+    <script type="text/javascript" src="./angular.min.js"></script>
+    <style>
+        body {
+            background: #c9b3b3;
+            color: #fff;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .box {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .boxS {
+            width: 40%;
+            margin: 50px;
+            background: #191313;
+            border: 1px solid #585353;
+            border-radius: 10px;
+        }
+
+        .row {
+            padding: 20px;
+        }
+
+        .row span {
+            font-weight: bold;
+        }
+
+        .title {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .title a {
+            color: #d84141;
+            font-size: 22px;
+        }
+
+        th a {
+            color: #d84141;
+            font-size: 22px;
+        }
+
+        button {
+            background-color: #d84141;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        tbody th {
+            width: 16%;
+            border: 1px solid #d841414a;
+        }
+
+        .details {
+            display: flex;
+            flex-wrap: wrap;
+            color: #fff;
+        }
+
+        .details label {
+            margin-left: 30px;
+        }
+
+        .details span {
+            margin-left: 10px;
+        }
+        th,td{
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div ng-app="App" ng-controller="Ctrl">
+        <div class="title">
+            <a href="index.html">home</a>
+            <a href="search.html">search</a>
+            <a href="fundraiser.html">details</a>
+            <a href="donation.html">donation</a>
+        </div>
+        <div class="row">
+            <!-- <div style="text-align: center;">
+                <img id="imgurl" src="" alt="" style="width: 500px;height: 400px;">
+            </div> -->
+            <div class="details">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>FUNDRAISERID</th>
+                            <th>DONATION_ID</th>
+                            <th>DATE</th>
+                            <th>AMOUNT</th>
+                            <th>GIVER</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in list">
+                            <td>{{item.FUNDRAISERID}}</td>
+                            <td>{{item.DONATION_ID}}</td>
+                            <td>{{item.DATE | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                            <td>{{item.AMOUNT}}</td>
+                            <td>{{item.GIVER}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div style="display: flex;justify-content: center;">
+            <button type="button" ng-click="Donate()" style="margin: 30px;">Donate</button>
+        </div>
+    </div>
+    </div>
+    <script type="text/javascript">
+        var app = angular.module('App', []);
+        app.controller('Ctrl', function ($scope, $http) {
+            $scope.paraminit = location.search ? location.search.split('?') : ''
+            $http.get(`http://localhost:4008/getDonationsByFUNDRAISERID?FUNDRAISERID=${$scope.paraminit[1]}`)
+                .success(function (response) {
+                    $scope.list = response;
+                });
+            $scope.Donate = function () {
+                location.href = `./donation.html?${$scope.paraminit[1]}`
+            }
+        });
+    </script>
+</body>
+
+</html>
